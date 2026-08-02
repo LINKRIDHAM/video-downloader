@@ -1,0 +1,102 @@
+Kode downloader
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fast Video Downloader - Tanpa Watermark</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen flex flex-col justify-between">
+
+<!-- Header -->
+<header class="p-6 text-center">
+<h1 class="text-3xl font-bold text-sky-400">⚡ Fast Video Downloader</h1>
+<p class="text-slate-400 text-sm mt-1">Download Video TikTok, YouTube, & Instagram Tanpa Watermark</p>
+</header>
+
+<!-- Konten Utama -->
+<main class="max-w-xl w-full mx-auto p-6 bg-slate-800 rounded-2xl shadow-xl mb-auto">
+<div class="space-y-4">
+<div>
+<label class="block text-sm font-medium text-slate-300 mb-2">Tempel Link Video di Sini:</label>
+<input type="text" id="urlInput" placeholder="https://www.tiktok.com/... atau https://instagram.com/..."
+class="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:border-sky-500 text-white text-sm">
+</div>
+
+<button onclick="downloadVideo()" id="downloadBtn"
+class="w-full bg-sky-500 hover:bg-sky-600 font-semibold py-3 rounded-lg transition duration-200 cursor-pointer">
+Proses Unduh Sekarang
+</button>
+</div>
+
+<!-- Area Hasil / Loading -->
+<div id="resultArea" class="mt-6 hidden text-center border-t border-slate-700 pt-4">
+<p id="statusText" class="text-yellow-400 mb-2 text-sm">Sedang memproses video...</p>
+<div id="downloadLinkContainer"></div>
+</div>
+</main>
+
+<!-- Footer -->
+<footer class="p-6 text-center text-slate-500 text-xs">
+© 2026 Fast Downloader. 100% Gratis & Tanpa Iklan Mengganggu.
+</footer>
+
+<!-- Logika Penghubung API -->
+<script>
+async function downloadVideo() {
+const url = document.getElementById('urlInput').value.trim();
+const resultArea = document.getElementById('resultArea');
+const statusText = document.getElementById('statusText');
+const container = document.getElementById('downloadLinkContainer');
+const btn = document.getElementById('downloadBtn');
+
+if (!url) {
+alert('Tolong masukkan link videonya terlebih dahulu!');
+return;
+}
+
+resultArea.classList.remove('hidden');
+statusText.innerText = "Menghubungkan ke server pengunduh...";
+container.innerHTML = "";
+btn.disabled = true;
+btn.innerText = "Memproses...";
+
+try {
+// Menggunakan Cobalt API Publik yang gratis dan handal
+const response = await fetch('https://api.cobalt.tools/api/json', {
+method: 'POST',
+headers: {
+'Accept': 'application/json',
+'Content-Type': 'application/json'
+},
+body: JSON.stringify({
+url: url,
+vQuality: "720"
+})
+});
+
+const data = await response.json();
+
+if (data.status === 'redirect' || data.status === 'stream' || data.status === 'picker') {
+statusText.innerText = "Video Berhasil Disiapkan!";
+
+let downloadUrl = data.url || (data.picker && data.picker[0].url);
+
+container.innerHTML = &lt;a href="${downloadUrl}" target="_blank" class="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-200 text-sm"&gt; ⬇️ Klik Disini Untuk Unduh File &lt;/a&gt;;
+} else {
+statusText.innerText = "Gagal memproses video.";
+container.innerHTML = <p class="text-red-400 text-xs mt-2"&gt;Pastikan link valid atau coba video lain.&lt;/p>;
+}
+} catch (error) {
+statusText.innerText = "Terjadi kesalahan jaringan.";
+container.innerHTML = <p class="text-red-400 text-xs mt-2"&gt;Gagal terhubung ke server API.&lt;/p>;
+} finally {
+btn.disabled = false;
+btn.innerText = "Proses Unduh Sekarang";
+}
+}
+</script>
+</body>
+</html>

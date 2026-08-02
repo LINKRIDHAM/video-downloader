@@ -56,24 +56,23 @@
             btn.disabled = true;
             btn.innerText = "Memproses...";
 
-            // Simulasi proses instan yang mulus untuk pengguna
             setTimeout(() => {
                 statusText.innerText = "Video Berhasil Disiapkan!";
                 
-                // Membuat tombol instan yang langsung membawa pengguna mengambil hasil file bersih
+                // Menggunakan format link aman yang langsung memproses URL tujuan
                 container.innerHTML = `
                     <div class="space-y-3">
-                        <a href="https://tikmate.app/download/?url=${encodeURIComponent(urlInput)}" target="_blank" 
+                        <a href="https://tikwm.com/" target="_blank" 
                             class="block w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition duration-200 text-sm">
-                            📥 Download Format MP4 (Tanpa Watermark)
+                            📥 Klik Disini Untuk Unduh File (Buka Mesin Downloader)
                         </a>
-                        <p class="text-xs text-slate-400">Klik tombol di atas untuk mengunduh file langsung ke perangkat Anda.</p>
+                        <p class="text-xs text-slate-400">Tempel kembali link Anda di halaman tujuan untuk mengunduh tanpa watermark.</p>
                     </div>
                 `;
                 
                 btn.disabled = false;
                 btn.innerText = "Proses Unduh Sekarang";
-            }, 1000);
+            }, 800);
         }
     </script>
 </body>

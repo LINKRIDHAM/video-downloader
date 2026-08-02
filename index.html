@@ -10,6 +10,7 @@
 
     <header class="p-6 text-center">
         <h1 class="text-3xl font-bold text-sky-400">⚡ Fast Video Downloader</h1>
+        <p class="text-slate-400 text-sm mt-1">Download Video TikTok, YouTube, & Instagram</p>
     </header>
 
     <main class="max-w-xl w-full mx-auto p-6 bg-slate-800 rounded-2xl shadow-xl mb-auto">
@@ -20,7 +21,6 @@
                     class="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:border-sky-500 text-white text-sm">
             </div>
 
-            <!-- Tombol Panggil Fungsi -->
             <button onclick="startDownload()" id="downloadBtn" 
                 class="w-full bg-sky-500 hover:bg-sky-600 font-semibold py-3 rounded-lg transition duration-200 cursor-pointer">
                 Proses Unduh Sekarang
@@ -37,7 +37,6 @@
         &copy; 2026 Fast Downloader.
     </footer>
 
-    <!-- Logika JavaScript yang Disederhanakan -->
     <script>
         function startDownload() {
             const urlInput = document.getElementById('urlInput').value.trim();
@@ -46,74 +45,50 @@
             const container = document.getElementById('downloadLinkContainer');
             const btn = document.getElementById('downloadBtn');
 
-            // Validasi Input
             if (!urlInput) {
                 alert('Tolong masukkan link videonya terlebih dahulu!');
                 return;
             }
 
-            // Tampilkan Loading
             resultArea.classList.remove('hidden');
-            statusText.innerText = "Menghubungkan ke server...";
+            statusText.innerText = "Menyiapkan link unduhan...";
             container.innerHTML = "";
             btn.disabled = true;
             btn.innerText = "Memproses...";
 
-            // Panggil API Publik (Tanpa async/await agar lebih aman di browser lama)
-            const apiUrl = 'https://api.cobalt.tools/api/json';
-            const requestBody = {
-                url: urlInput,
-                vQuality: "720"
-            };
+            // Menggunakan API alternatif (TikWM / Layanan Publik Serbaguna)
+            // Contoh menggunakan endpoint GET publik
+            const apiUrl = 'https://www.tikwm.com/api/?url=' + encodeURIComponent(urlInput);
 
-            fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestBody)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Gagal terhubung ke API (Status: ' + response.status + ')');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Tangani Respon Berhasil
-                if (data.status === 'redirect' || data.status === 'stream' || data.status === 'picker') {
+            fetch(apiUrl)
+            .then(response => response.json())
+            .then(res => {
+                if (res.code === 0 && res.data) {
                     statusText.innerText = "Video Berhasil Disiapkan!";
-                    
-                    // Ambil URL Download (sesuai format respon API cobalt)
-                    let downloadUrl = data.url || (data.picker && data.picker[0] && data.picker[0].url);
+                    const downloadUrl = res.data.play || res.data.hdplay;
 
-                    if (downloadUrl) {
-                         container.innerHTML = `
-                            <a href="${downloadUrl}" target="_blank" 
-                                class="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-200 text-sm">
-                                ⬇️ Klik Disini Untuk Unduh File
-                            </a>
-                         `;
-                    } else {
-                         statusText.innerText = "Maaf, URL video tidak ditemukan.";
-                         container.innerHTML = `<p class='text-red-400 text-xs mt-1'>Format tidak didukung atau link salah.</p>`;
-                    }
-
+                    container.innerHTML = `
+                        <a href="${downloadUrl}" target="_blank" 
+                            class="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-200 text-sm">
+                            ⬇️ Klik Disini Untuk Unduh File
+                        </a>
+                    `;
                 } else {
-                    // Tangani Respon Gagal
-                    statusText.innerText = "Gagal memproses video.";
-                    container.innerHTML = `<p class='text-red-400 text-xs mt-1'>Pastikan link valid (TikTok/YouTube).</p>`;
+                    // Jika bukan TikTok atau API khusus gagal, arahkan ke layanan redirect aman
+                    statusText.innerText = "Silakan unduh melalui tautan alternatif:";
+                    container.innerHTML = `
+                        <a href="https://tikwm.com/" target="_blank" 
+                            class="inline-block bg-sky-600 hover:bg-sky-700 text-white font-bold py-2 px-4 rounded-lg text-sm mt-2">
+                            Buka Mesin Downloader Utama
+                        </a>
+                    `;
                 }
             })
             .catch(error => {
-                // Tangani Error Jaringan/CORS
-                statusText.innerText = "Error Terjadi";
-                container.innerHTML = `<p class='text-red-400 text-xs mt-1'>Cek konsol browser atau coba lagi nanti.</p>`;
-                console.error('Error detail:', error);
+                statusText.innerText = "Gagal memproses.";
+                container.innerHTML = `<p class='text-red-400 text-xs mt-1'>Coba gunakan link TikTok yang valid.</p>`;
             })
             .finally(() => {
-                // Kembalikan Tombol
                 btn.disabled = false;
                 btn.innerText = "Proses Unduh Sekarang";
             });
